@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Textil Roll Manager - Portal de Seguridad 2FA</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+        }
+        /* Custom animations */
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white overflow-x-hidden">
+
+    <!-- Background decorative gradients -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div class="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+        <div class="absolute top-1/2 -right-40 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-25 animate-pulse"></div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <main class="flex-grow flex flex-col z-10">
+
+        <!-- LOGIN SECTION -->
+        <section id="login-section" class="flex-grow flex items-center justify-center p-6 fade-in">
+            <div class="w-full max-w-md backdrop-blur-xl bg-slate-900/60 border border-slate-800/80 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+                <!-- Glowing line -->
+                <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-indigo-500 to-transparent"></div>
+                
+                <!-- HEADER (Step 1 & 2) -->
+                <div class="text-center mb-8">
+                    <div class="inline-flex p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl text-indigo-400 mb-3 shadow-inner">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
+                        </svg>
+                    </div>
+                    <h1 id="login-title" class="text-3xl font-extrabold text-white tracking-tight">Iniciar Sesión</h1>
+                    <p id="login-subtitle" class="text-slate-400 text-sm mt-2">Acceso seguro con autenticación de dos pasos</p>
+                </div>
+
+                <!-- ERROR BOX -->
+                <div id="login-error" class="hidden mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-200 rounded-2xl text-sm fade-in flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 flex-shrink-0">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                    </svg>
+                    <span id="login-error-text">Credenciales incorrectas.</span>
+                </div>
+
+                <!-- STEP 1 FORM: CREDENTIALS -->
+                <form id="credentials-form" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Usuario</label>
+                        <input type="text" id="username" required
+                            class="w-full bg-slate-950/80 border border-slate-800 text-slate-100 px-4 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition placeholder-slate-600"
+                            placeholder="admin">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Contraseña</label>
+                        <input type="password" id="password" required
+                            class="w-full bg-slate-950/80 border border-slate-800 text-slate-100 px-4 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition placeholder-slate-600"
+                            placeholder="••••••••">
+                    </div>
+                    <button type="submit"
+                        class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg shadow-indigo-600/30 hover:shadow-indigo-500/40 transform hover:-translate-y-[2px] flex items-center justify-center gap-2">
+                        <span>Siguiente Paso</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                        </svg>
+                    </button>
+                </form>
+
+                <!-- STEP 2 FORM: MFA CODE -->
+                <form id="mfa-verify-form" class="hidden space-y-5 fade-in">
+                    <div class="text-center p-4 bg-indigo-500/5 border border-indigo-500/10 rounded-2xl mb-4">
+                        <p class="text-xs text-indigo-300">Este usuario tiene la seguridad 2FA activa. Abre tu aplicación <strong>Google Authenticator</strong> e introduce el código actual.</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 text-center">Código de Seguridad de 6 Dígitos</label>
+                        <input type="text" id="mfa-code" required maxlength="6" pattern="[0-9]{6}" autocomplete="off"
+                            class="w-full bg-slate-950/80 border border-slate-800 text-slate-100 tracking-[0.6em] text-center font-bold text-2xl px-4 py-3.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition placeholder-slate-800"
+                            placeholder="000000">
+                    </div>
+                    <button type="submit"
+                        class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg shadow-emerald-600/30 hover:shadow-emerald-500/40 transform hover:-translate-y-[2px] flex items-center justify-center gap-2">
+                        <span>Verificar e Ingresar</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                    </button>
+                    <button type="button" id="btn-back-to-login"
+                        class="w-full py-3 bg-transparent text-slate-500 hover:text-slate-300 text-sm transition font-medium">
+                        Volver a ingresar contraseña
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center border-t border-slate-800/80 pt-6">
+                    <p class="text-xs text-slate-500">Credenciales por defecto: <span class="text-indigo-400/80 font-mono">admin / 123456</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DASHBOARD SECTION (Hidden by default) -->
+        <section id="dashboard-section" class="hidden flex-grow flex flex-col p-6 max-w-7xl mx-auto w-full fade-in">
+            <!-- Navbar / Header -->
+            <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8 pb-6 border-b border-slate-800/80">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <span class="p-2.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205 3 1m1.5-11.5-2.25.818M19.5 9.591V21a.75.75 0 0 1-.75.75H12M3 13.125C3 12.504 3.504 12 4.125 12h5.25c.621 0 1.125.504 1.125 1.125v5.875c0 .621-.504 1.125-1.125 1.125h-5.25C3.504 20 3 19.504 3 18.875v-5.875Z" />
+                            </svg>
+                        </span>
+                        <h2 class="text-3xl font-extrabold text-white tracking-tight">Textiles Rollos Inc.</h2>
+                    </div>
+                    <p class="text-slate-400 text-sm mt-1">Inventario en tiempo real con seguridad robusta 2FA</p>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 bg-slate-900/60 border border-slate-800/80 px-4 py-2 rounded-2xl text-xs">
+                        <span class="text-slate-500">Usuario:</span>
+                        <strong id="user-display" class="text-indigo-400">admin</strong>
+                    </div>
+                    
+                    <!-- 2FA CONFIG TRIGGER -->
+                    <button id="btn-toggle-mfa-panel"
+                        class="px-4 py-2.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 font-semibold rounded-2xl transition-all duration-300 text-xs flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+                        </svg>
+                        <span id="txt-mfa-badge">Configurar 2FA</span>
+                    </button>
+
+                    <button id="btn-logout"
+                        class="px-5 py-2.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/20 font-semibold rounded-2xl transition-all duration-300 text-sm flex items-center gap-2">
+                        <span>Salir</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- EXCHANGE RATE SECTION -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 fade-in">
+                <!-- Current Rate Card -->
+                <div class="lg:col-span-1 backdrop-blur-xl bg-slate-900/60 border border-slate-800/80 p-6 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[220px]">
+                    <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-500 to-transparent"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Tipo de Cambio Real (API)</span>
+                            <span class="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg text-xs font-bold animate-pulse">
+                                API Activa
+                            </span>
+                        </div>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-xs text-slate-500 font-medium">1 USD =</span>
+                            <span class="text-4xl font-black text-white" id="usd-rate-display">3.750</span>
+                            <span class="text-lg font-bold text-slate-400">PEN</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2">Dato en tiempo real consumido desde la API externa de tipo de cambio.</p>
+                    </div>
+
+                    <!-- Small Dynamic Converter -->
+                    <div class="mt-4 pt-4 border-t border-slate-800/50 flex gap-2 items-center">
+                        <div class="relative flex-grow">
+                            <input type="number" id="converter-usd" placeholder="USD" value="1" min="0" class="w-full bg-slate-950/80 border border-slate-800 text-slate-100 text-sm px-3 py-2 rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                            <span class="absolute right-3 top-2 text-xs text-slate-500 font-bold">USD</span>
+                        </div>
+                        <span class="text-slate-500 font-bold">=</span>
+                        <div class="relative flex-grow">
+                            <input type="text" id="converter-pen" readonly value="3.75" class="w-full bg-slate-950/50 border border-slate-800/80 text-emerald-400 text-sm px-3 py-2 rounded-xl focus:outline-none">
+                            <span class="absolute right-3 top-2 text-xs text-slate-500 font-bold">PEN</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historical Table Card -->
+                <div class="lg:col-span-2 backdrop-blur-xl bg-slate-900/60 border border-slate-800/80 p-6 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[220px]">
+                    <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-indigo-500 to-transparent"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Historial Reciente de Cotizaciones (PEN)</span>
+                            <span class="text-xs text-slate-500">Últimos 5 días</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-800 text-slate-400 font-medium">
+                                        <th class="py-2.5 px-3">Fecha</th>
+                                        <th class="py-2.5 px-3">De (Moneda)</th>
+                                        <th class="py-2.5 px-3">A (Moneda)</th>
+                                        <th class="py-2.5 px-3 text-emerald-400">Tasa Compra</th>
+                                        <th class="py-2.5 px-3 text-indigo-400">Tasa Venta</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="exchange-rate-table-body" class="text-slate-300 font-mono">
+                                    <tr>
+                                        <td colspan="5" class="py-4 text-center text-slate-500">Cargando historial...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2FA CONFIGURATION PANEL (Hidden Modal overlay) -->
+            <div id="mfa-config-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-6 fade-in">
+                <div class="w-full max-w-md bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl relative">
+                    <button id="btn-close-mfa" class="absolute top-4 right-4 text-slate-500 hover:text-white transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+
+                    <h3 class="text-2xl font-black text-white tracking-tight mb-2">Configurar Doble Factor (2FA)</h3>
+                    <p class="text-sm text-slate-400 mb-6">Protege tu cuenta utilizando Google Authenticator o Authy.</p>
+
+                    <!-- Loader inside setup -->
+                    <div id="mfa-setup-loading" class="flex flex-col items-center justify-center py-8">
+                        <div class="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+
+                    <!-- Setup Content -->
+                    <div id="mfa-setup-content" class="hidden space-y-6">
+                        <!-- Step 1: Scan QR -->
+                        <div class="flex flex-col items-center">
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">1. Escanea el código QR</p>
+                            <div class="bg-white p-3 rounded-2xl mb-3 shadow-lg">
+                                <img id="mfa-qr-img" src="" alt="MFA QR Code" class="w-48 h-48">
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs text-slate-400">Si no puedes escanear, introduce esta clave secreta:</p>
+                                <code id="mfa-secret-text" class="block bg-slate-950 px-3 py-1.5 rounded-lg text-indigo-400 font-mono text-sm mt-1.5 border border-slate-800 select-all">SECRETKEY</code>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Confirm Code -->
+                        <form id="mfa-enable-form" class="space-y-4 border-t border-slate-800 pt-4">
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 text-center">2. Confirma el código de tu app</p>
+                            <input type="text" id="mfa-setup-code" required placeholder="000000" maxlength="6" pattern="[0-9]{6}" autocomplete="off"
+                                class="w-full bg-slate-950 border border-slate-800 text-center text-xl font-bold tracking-[0.3em] px-4 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
+                            
+                            <div id="mfa-setup-error" class="hidden text-xs text-red-400 text-center">Código incorrecto, vuelve a intentar.</div>
+
+                            <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl transition">
+                                Habilitar Seguridad 2FA
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading indicator -->
+            <div id="catalog-loading" class="flex flex-col items-center justify-center p-12 text-center">
+                <div class="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p class="text-slate-400 text-sm">Cargando inventario desde la base de datos...</p>
+            </div>
+
+            <!-- Error message -->
+            <div id="catalog-error" class="hidden mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-200 rounded-2xl text-sm fade-in flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                </svg>
+                <span>Error al recuperar el inventario. Tu sesión podría haber expirado.</span>
+            </div>
+
+            <!-- Empty catalog notice -->
+            <div id="catalog-empty" class="hidden flex flex-col items-center justify-center p-16 text-center backdrop-blur-xl bg-slate-900/40 border border-slate-800/80 rounded-3xl">
+                <div class="inline-flex p-4 bg-slate-800 text-slate-500 rounded-full mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">No hay telas registradas</h3>
+                <p class="text-slate-400 text-sm max-w-sm">La tabla telas de tu base de datos sistemabd está vacía en este momento.</p>
+            </div>
+
+            <!-- CATALOG GRID -->
+            <div id="catalog-grid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+                <!-- Dynamic cards will be appended here -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-6 border-t border-slate-900 text-center text-xs text-slate-600 bg-slate-950/80 z-10">
+        <p>© 2026 Textiles Rollos Inc. Arquitectura Hexagonal y Seguridad Distribuida.</p>
+    </footer>
+
+    <!-- APP CLIENT-SIDE LOGIC -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // CONFIGURACIÓN DE URL DEL API GATEWAY
+            // Deja vacío '' si el frontend se aloja en el propio Gateway.
+            // Pon 'https://tu-gateway.onrender.com' si subes este index.html a tu hosting independiente.
+            const API_BASE_URL = '';
+
+            const loginSection = document.getElementById('login-section');
+            const dashboardSection = document.getElementById('dashboard-section');
+            const credentialsForm = document.getElementById('credentials-form');
+            const mfaVerifyForm = document.getElementById('mfa-verify-form');
+            
+            const loginTitle = document.getElementById('login-title');
+            const loginSubtitle = document.getElementById('login-subtitle');
+            
+            const loginError = document.getElementById('login-error');
+            const loginErrorText = document.getElementById('login-error-text');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const mfaCodeInput = document.getElementById('mfa-code');
+            const btnBackToLogin = document.getElementById('btn-back-to-login');
+            
+            const userDisplay = document.getElementById('user-display');
+            const btnLogout = document.getElementById('btn-logout');
+            
+            const btnToggleMfaPanel = document.getElementById('btn-toggle-mfa-panel');
+            const txtMfaBadge = document.getElementById('txt-mfa-badge');
+            
+            // MFA Modal elements
+            const mfaConfigModal = document.getElementById('mfa-config-modal');
+            const btnCloseMfa = document.getElementById('btn-close-mfa');
+            const mfaSetupLoading = document.getElementById('mfa-setup-loading');
+            const mfaSetupContent = document.getElementById('mfa-setup-content');
+            const mfaQrImg = document.getElementById('mfa-qr-img');
+            const mfaSecretText = document.getElementById('mfa-secret-text');
+            const mfaEnableForm = document.getElementById('mfa-enable-form');
+            const mfaSetupCode = document.getElementById('mfa-setup-code');
+            const mfaSetupError = document.getElementById('mfa-setup-error');
+            
+            const catalogLoading = document.getElementById('catalog-loading');
+            const catalogError = document.getElementById('catalog-error');
+            const catalogEmpty = document.getElementById('catalog-empty');
+            const catalogGrid = document.getElementById('catalog-grid');
+
+            let userMfaEnabled = false;
+
+            // Securización de llamadas API mediante JWT
+            async function securedFetch(url, options = {}) {
+                const token = sessionStorage.getItem('jwt_token');
+                if (!options.headers) {
+                    options.headers = {};
+                }
+                if (token) {
+                    options.headers['Authorization'] = 'Bearer ' + token;
+                }
+                const res = await fetch(url, options);
+                if (res.status === 401 || res.status === 403) {
+                    sessionStorage.clear();
+                    showLogin();
+                    throw new Error("No autorizado");
+                }
+                return res;
+            }
+
+            // Check session
+            checkSession();
+
+            function checkSession() {
+                const sessionUsername = sessionStorage.getItem('username');
+                const token = sessionStorage.getItem('jwt_token');
+                userMfaEnabled = sessionStorage.getItem('mfa_enabled') === 'true';
+
+                if (sessionUsername && token) {
+                    userDisplay.textContent = sessionUsername;
+                    updateMfaBadge();
+                    showDashboard();
+                } else {
+                    showLogin();
+                }
+            }
+
+            function showLogin() {
+                loginSection.classList.remove('hidden');
+                dashboardSection.classList.add('hidden');
+                loginError.classList.add('hidden');
+                credentialsForm.classList.remove('hidden');
+                mfaVerifyForm.classList.add('hidden');
+                loginTitle.textContent = "Iniciar Sesión";
+                loginSubtitle.textContent = "Acceso seguro con autenticación de dos pasos";
+            }
+
+            function showDashboard() {
+                loginSection.classList.add('hidden');
+                dashboardSection.classList.remove('hidden');
+                loadInventory();
+                loadExchangeRates();
+            }
+
+            let currentUsdPenRate = 3.75;
+
+            async function loadExchangeRates() {
+                const usdRateDisplay = document.getElementById('usd-rate-display');
+                const converterUsd = document.getElementById('converter-usd');
+                const converterPen = document.getElementById('converter-pen');
+                const tableBody = document.getElementById('exchange-rate-table-body');
+
+                try {
+                    // Fetch latest rate (público)
+                    const latestRes = await fetch(API_BASE_URL + '/api/exchange-rate/latest');
+                    if (latestRes.ok) {
+                        const rate = await latestRes.json();
+                        currentUsdPenRate = parseFloat(rate);
+                        usdRateDisplay.textContent = currentUsdPenRate.toFixed(3);
+                        converterPen.value = (parseFloat(converterUsd.value) * currentUsdPenRate).toFixed(2);
+                    }
+
+                    // Converter inputs binding
+                    converterUsd.addEventListener('input', () => {
+                        const usdVal = parseFloat(converterUsd.value) || 0;
+                        converterPen.value = (usdVal * currentUsdPenRate).toFixed(2);
+                    });
+
+                    // Fetch history (público)
+                    const historyRes = await fetch(API_BASE_URL + '/api/exchange-rate/history');
+                    if (historyRes.ok) {
+                        const historyList = await historyRes.json();
+                        tableBody.innerHTML = '';
+                        historyList.forEach(item => {
+                            const tr = document.createElement('tr');
+                            tr.className = "border-b border-slate-800/50 hover:bg-slate-900/30 transition-colors text-xs";
+                            tr.innerHTML = `
+                                <td class="py-2 px-3 text-slate-400 font-sans">${item.fecha}</td>
+                                <td class="py-2 px-3">${item.monedaBase}</td>
+                                <td class="py-2 px-3">${item.monedaDestino}</td>
+                                <td class="py-2 px-3 text-emerald-400 font-bold">S/. ${item.compra.toFixed(3)}</td>
+                                <td class="py-2 px-3 text-indigo-400 font-bold">S/. ${item.venta.toFixed(3)}</td>
+                            `;
+                            tableBody.appendChild(tr);
+                        });
+                    }
+                } catch (e) {
+                    console.error("Failed to load exchange rates from API:", e);
+                }
+            }
+
+            function updateMfaBadge() {
+                if (userMfaEnabled) {
+                    txtMfaBadge.textContent = "2FA Activado";
+                    btnToggleMfaPanel.className = "px-4 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 font-semibold rounded-2xl transition-all duration-300 text-xs flex items-center gap-2 cursor-default";
+                } else {
+                    txtMfaBadge.textContent = "Configurar 2FA";
+                    btnToggleMfaPanel.className = "px-4 py-2.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 font-semibold rounded-2xl transition-all duration-300 text-xs flex items-center gap-2 cursor-pointer";
+                }
+            }
+
+            // STEP 1: SUBMIT CREDENTIALS
+            credentialsForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                loginError.classList.add('hidden');
+                
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                try {
+                    const response = await fetch(API_BASE_URL + '/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        if (data.mfaRequired) {
+                            // MFA is required: Transition to Step 2
+                            credentialsForm.classList.add('hidden');
+                            mfaVerifyForm.classList.remove('hidden');
+                            loginTitle.textContent = "Código de Seguridad";
+                            loginSubtitle.textContent = "Ingresa el código OTP de tu celular";
+                            sessionStorage.setItem('temp_username', data.username);
+                            mfaCodeInput.focus();
+                        } else {
+                            // MFA is not required: Fully authenticated
+                            sessionStorage.setItem('username', data.username);
+                            sessionStorage.setItem('mfa_enabled', 'false');
+                            sessionStorage.setItem('jwt_token', data.token);
+                            userMfaEnabled = false;
+                            
+                            // Clear inputs
+                            usernameInput.value = '';
+                            passwordInput.value = '';
+                            
+                            checkSession();
+                        }
+                    } else {
+                        loginErrorText.textContent = data.mensaje || "Credenciales incorrectas.";
+                        loginError.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error("Login credentials request failed:", error);
+                    loginErrorText.textContent = "Error de comunicación con el servidor.";
+                    loginError.classList.remove('hidden');
+                }
+            });
+
+            // STEP 2: VERIFY MFA CODE
+            mfaVerifyForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                loginError.classList.add('hidden');
+                
+                const code = parseInt(mfaCodeInput.value.trim());
+                const username = sessionStorage.getItem('temp_username');
+
+                try {
+                    const response = await fetch(API_BASE_URL + '/api/auth/mfa/verify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, code })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        sessionStorage.setItem('username', data.username);
+                        sessionStorage.setItem('mfa_enabled', 'true');
+                        sessionStorage.setItem('jwt_token', data.token);
+                        sessionStorage.removeItem('temp_username');
+                        userMfaEnabled = true;
+
+                        mfaCodeInput.value = '';
+                        usernameInput.value = '';
+                        passwordInput.value = '';
+
+                        checkSession();
+                    } else {
+                        loginErrorText.textContent = "Código incorrecto. Vuelve a intentarlo.";
+                        loginError.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error("MFA code validation failed:", error);
+                    loginErrorText.textContent = "Error al verificar código.";
+                    loginError.classList.remove('hidden');
+                }
+            });
+
+            btnBackToLogin.addEventListener('click', () => {
+                sessionStorage.removeItem('temp_username');
+                showLogin();
+            });
+
+            // LOGOUT HANDLER
+            btnLogout.addEventListener('click', () => {
+                sessionStorage.clear();
+                showLogin();
+            });
+
+            // 2FA SETUP MODAL TRIGGER
+            btnToggleMfaPanel.addEventListener('click', () => {
+                if (userMfaEnabled) return;
+
+                mfaConfigModal.classList.remove('hidden');
+                mfaSetupLoading.classList.remove('hidden');
+                mfaSetupContent.classList.add('hidden');
+                mfaSetupError.classList.add('hidden');
+                mfaSetupCode.value = '';
+
+                const username = sessionStorage.getItem('username');
+
+                // Call setup endpoint (secured)
+                securedFetch(API_BASE_URL + `/api/auth/mfa/setup?username=${username}`)
+                    .then(res => {
+                        if (!res.ok) throw new Error();
+                        return res.json();
+                    })
+                    .then(data => {
+                        mfaSetupLoading.classList.add('hidden');
+                        mfaSetupContent.classList.remove('hidden');
+                        
+                        mfaQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.qrCodeUrl)}`;
+                        mfaSecretText.textContent = data.secret;
+                    })
+                    .catch(e => {
+                        console.error("MFA setup loading failed:", e);
+                        mfaConfigModal.classList.add('hidden');
+                    });
+            });
+
+            btnCloseMfa.addEventListener('click', () => {
+                mfaConfigModal.classList.add('hidden');
+            });
+
+            // CONFIRM 2FA ENABLING
+            mfaEnableForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                mfaSetupError.classList.add('hidden');
+                
+                const code = parseInt(mfaSetupCode.value.trim());
+                const username = sessionStorage.getItem('username');
+
+                try {
+                    const response = await securedFetch(API_BASE_URL + '/api/auth/mfa/enable', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, code })
+                    });
+
+                    if (response.ok) {
+                        sessionStorage.setItem('mfa_enabled', 'true');
+                        userMfaEnabled = true;
+                        updateMfaBadge();
+                        mfaConfigModal.classList.add('hidden');
+                    } else {
+                        mfaSetupError.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error("Failed to enable 2FA:", error);
+                    mfaSetupError.classList.remove('hidden');
+                }
+            });
+
+            // FETCH SECURED FABRIC INVENTORY
+            async function loadInventory() {
+                catalogLoading.classList.remove('hidden');
+                catalogError.classList.add('hidden');
+                catalogEmpty.classList.add('hidden');
+                catalogGrid.classList.add('hidden');
+                catalogGrid.innerHTML = '';
+
+                try {
+                    const response = await securedFetch(API_BASE_URL + '/api/telas');
+                    const list = await response.json();
+                    catalogLoading.classList.add('hidden');
+
+                    if (list.length === 0) {
+                        catalogEmpty.classList.remove('hidden');
+                    } else {
+                        displayCatalog(list);
+                    }
+                } catch (error) {
+                    console.error("Fetch fabrics error:", error);
+                    catalogLoading.classList.add('hidden');
+                    catalogError.classList.remove('hidden');
+                }
+            }
+
+            // RENDER CARDS
+            function displayCatalog(fabrics) {
+                fabrics.forEach(tela => {
+                    const card = document.createElement('div');
+                    card.className = "backdrop-blur-xl bg-slate-900/40 border border-slate-800/80 rounded-3xl overflow-hidden hover:border-indigo-500/50 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all duration-300 transform hover:-translate-y-1 fade-in";
+                    
+                    const placeholderGradient = `linear-gradient(135deg, ${getColorHue(tela.color)}, ${getColorHue(tela.color, true)})`;
+                    const imgUrl = tela.imagenUrl || 'https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?w=400';
+
+                    card.innerHTML = `
+                        <!-- Card Image -->
+                        <div class="h-44 w-full relative overflow-hidden bg-slate-950">
+                            <div class="absolute inset-0 opacity-40 mix-blend-overlay" style="background: ${placeholderGradient};"></div>
+                            <img src="${imgUrl}" alt="${tela.tipoTela}" class="w-full h-full object-cover opacity-90 transition-transform duration-500 hover:scale-110" onerror="this.src='https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?w=400'">
+                            <span class="absolute top-4 right-4 text-xs font-bold uppercase tracking-wider bg-slate-950/80 backdrop-blur-md border border-slate-700/50 px-3 py-1.5 rounded-full text-indigo-400">
+                                Rollo #${tela.id}
+                            </span>
+                        </div>
+                        
+                        <!-- Card Content -->
+                        <div class="p-6">
+                            <span class="text-xs font-semibold tracking-wider text-slate-500 uppercase">${tela.tipoTela}</span>
+                            <h3 class="text-lg font-bold text-white truncate mt-1">${tela.tipoTela} ${tela.color}</h3>
+                            
+                            <!-- Badges -->
+                            <div class="flex gap-2 my-4">
+                                <span class="text-xs px-2.5 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 rounded-lg flex items-center gap-1.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-2.224-2.224l-.135-.042a3 3 0 0 0-2.224-2.224l-.042-.135a3 3 0 0 0-2.224-2.224l-.135-.042a3 3 0 0 0-2.224-2.224l-.042-.135A3.001 3.001 0 0 0 2.25 6h1.5a3 3 0 0 0 3-3V2.25a3 3 0 0 0 3-3h1.5a3 3 0 0 0 3 3V3a3 3 0 0 0 3 3h1.5a3.001 3.001 0 0 0 2.224-2.224l.042-.135a3 3 0 0 0 2.224-2.224l.135-.042A3.001 3.001 0 0 0 21.75 6h-1.5a3 3 0 0 0-3 3v.75a3 3 0 0 0-3 3h-1.5a3 3 0 0 0-3 3V16.122Z" />
+                                    </svg>
+                                    ${tela.color}
+                                </span>
+                                <span class="text-xs px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 rounded-lg flex items-center gap-1.5">
+                                    Stock: ${tela.metrosPorRollo} m
+                                </span>
+                            </div>
+
+                            <!-- Divider -->
+                            <div class="h-[1px] bg-slate-800/80 my-4"></div>
+
+                            <!-- Price details -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-slate-500">Precio por metro</span>
+                                <div class="text-right">
+                                    <span class="text-[10px] text-slate-500 block font-mono">USD $ ${(tela.precio / currentUsdPenRate).toFixed(2)}</span>
+                                    <span class="text-sm font-semibold text-slate-400">S/. </span>
+                                    <span class="text-2xl font-black text-white">${tela.precio.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    catalogGrid.appendChild(card);
+                });
+                catalogGrid.classList.remove('hidden');
+            }
+
+            // Helper to get nice CSS hue depending on fabric color name
+            function getColorHue(colorName, dark = false) {
+                const colors = {
+                    'azul': dark ? '#1e3a8a' : '#3b82f6',
+                    'rojo': dark ? '#7f1d1d' : '#ef4444',
+                    'verde': dark ? '#064e3b' : '#10b981',
+                    'gris': dark ? '#374151' : '#6b7280',
+                    'blanco': dark ? '#475569' : '#cbd5e1'
+                };
+                const lookup = colorName.toLowerCase();
+                for (let key in colors) {
+                    if (lookup.includes(key)) {
+                        return colors[key];
+                    }
+                }
+                return dark ? '#1e1b4b' : '#4f46e5';
+            }
+        });
+    </script>
+</body>
+</html>

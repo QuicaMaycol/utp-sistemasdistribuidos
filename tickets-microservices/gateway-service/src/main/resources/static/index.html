@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ShowPass es la plataforma más rápida e intuitiva para comprar boletos de tus espectáculos favoritos en línea.">
+    <title>ShowPass | Compra de Boletos en Línea</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --primary-glow: rgba(139, 92, 246, 0.35);
+            --accent: #06b6d4;
+            --accent-glow: rgba(6, 182, 212, 0.2);
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            letter-spacing: -0.05em;
+        }
+
+        .logo svg {
+            stroke: url(#logo-grad);
+        }
+
+        .status-badge {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            padding: 0.4rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section-title svg {
+            color: var(--primary);
+        }
+
+        /* Grid de Espectáculos */
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 5rem;
+        }
+
+        .event-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .event-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), 0 0 1px rgba(139, 92, 246, 0.1);
+        }
+
+        .event-card:hover::before {
+            opacity: 1;
+        }
+
+        .event-badge {
+            align-self: flex-start;
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            color: #c084fc;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .event-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+
+        .event-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .event-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 1rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .meta-item svg {
+            flex-shrink: 0;
+            color: var(--accent);
+        }
+
+        .event-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 1.25rem;
+        }
+
+        .event-price {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .price-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .price-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .buy-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+            color: var(--text-main);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .buy-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--primary-glow);
+            filter: brightness(1.1);
+        }
+
+        .buy-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .buy-btn:disabled {
+            background: #1e293b;
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+            border: 1px solid var(--card-border);
+        }
+
+        .stock-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .stock-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .stock-progress {
+            height: 100%;
+            background: var(--success);
+            border-radius: 9999px;
+            transition: width 0.5s ease;
+        }
+
+        .stock-progress.low {
+            background: var(--warning);
+        }
+
+        .stock-progress.critical {
+            background: var(--error);
+        }
+
+        /* Historial de Compras */
+        .bookings-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2.25rem;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .bookings-table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .booking-id {
+            font-family: monospace;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .booking-client {
+            font-weight: 500;
+        }
+
+        .booking-event {
+            font-weight: 600;
+        }
+
+        .booking-qty {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        .booking-amount {
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .booking-date {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .empty-bookings {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 3rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .empty-bookings svg {
+            color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            width: 100%;
+            max-width: 480px;
+            border-radius: 20px;
+            padding: 2.25rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: var(--text-main);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            color: var(--text-main);
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .qty-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .qty-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .qty-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .qty-input {
+            width: 60px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .price-summary {
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px dashed rgba(255, 255, 255, 0.08);
+        }
+
+        .summary-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .summary-total {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--success);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: var(--text-main);
+            border: none;
+            padding: 0.9rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+        }
+
+        .submit-btn:hover {
+            filter: brightness(1.1);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+        }
+
+        /* Notificación Flotante */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: -350px;
+            background: #1e293b;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            z-index: 10000;
+            transition: right 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            max-width: 320px;
+        }
+
+        .toast.active {
+            right: 2rem;
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        .toast.error {
+            border-left-color: var(--error);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.2rem; }
+            .events-grid { grid-template-columns: 1fr; }
+            .header-container { padding: 1rem; }
+            main { padding: 2rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <svg style="display: none;">
+        <defs>
+            <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8b5cf6" />
+                <stop offset="100%" stop-color="#06b6d4" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo" id="logoLink">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                    <path d="M3 10h18" />
+                    <path d="M8 14h.01" />
+                    <path d="M12 14h.01" />
+                    <path d="M16 14h.01" />
+                    <path d="M8 18h.01" />
+                    <path d="M12 18h.01" />
+                    <path d="M16 18h.01" />
+                </svg>
+                ShowPass
+            </a>
+            <div class="status-badge" id="serviceStatus">
+                <span class="status-dot"></span>
+                <span>Eureka Connected</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Compra tus boletos de forma <span>intuitiva y rápida</span></h1>
+            <p>Un sistema de ejemplo de Microservicios con Spring Boot, Spring Cloud Gateway, Eureka Server y OpenFeign.</p>
+        </section>
+
+        <!-- Cartelera -->
+        <section>
+            <h2 class="section-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="2" ry="2"/>
+                    <line x1="12" y1="18" x2="12" y2="12"/>
+                    <line x1="9" y1="15" x2="15" y2="15"/>
+                </svg>
+                Cartelera de Espectáculos
+            </h2>
+            <div class="events-grid" id="eventsGrid">
+                <!-- Se inyecta dinámicamente con JavaScript -->
+            </div>
+        </section>
+
+        <!-- Historial de compras -->
+        <section class="bookings-section">
+            <h2 class="section-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <polyline points="10 9 9 9 8 9"/>
+                </svg>
+                Historial de Ventas (Reservas en Tiempo Real)
+            </h2>
+            <div class="bookings-table-wrapper">
+                <table id="bookingsTable">
+                    <thead>
+                        <tr>
+                            <th>ID Compra</th>
+                            <th>Cliente</th>
+                            <th>Espectáculo</th>
+                            <th style="text-align: center;">Boletos</th>
+                            <th>Total Pagado</th>
+                            <th>Fecha/Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsBody">
+                        <!-- Se inyecta dinámicamente -->
+                    </tbody>
+                </table>
+                <div class="empty-bookings" id="emptyBookings">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="8" y1="12" x2="16" y2="12"/>
+                    </svg>
+                    <p>No se han registrado compras en esta sesión académica.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Compra -->
+    <div class="modal-overlay" id="bookingModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalEventTitle">Comprar Boletos</h3>
+                <button class="close-btn" id="closeModalBtn" aria-label="Cerrar modal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <form id="bookingForm">
+                <input type="hidden" id="modalEventId">
+                <div class="form-group">
+                    <label class="form-label" for="customerName">Nombre del Alumno/Cliente</label>
+                    <input type="text" id="customerName" class="form-control" placeholder="Ej. Juan Pérez" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cantidad de Boletos</label>
+                    <div class="qty-container">
+                        <button type="button" class="qty-btn" id="decQty">-</button>
+                        <input type="number" id="ticketQty" class="form-control qty-input" value="1" min="1" readonly>
+                        <button type="button" class="qty-btn" id="incQty">+</button>
+                    </div>
+                </div>
+
+                <div class="price-summary">
+                    <span class="summary-label">Total a pagar</span>
+                    <span class="summary-total" id="modalTotalPrice">$0.00</span>
+                </div>
+
+                <button type="submit" class="submit-btn">Confirmar Compra</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast de Notificación -->
+    <div class="toast" id="toast">
+        <span id="toastIcon"></span>
+        <span id="toastMessage">Acción completada con éxito</span>
+    </div>
+
+    <script>
+        const API_URLS = {
+            events: '/api/events',
+            bookings: '/api/bookings'
+        };
+
+        let selectedEvent = null;
+
+        // Elementos del DOM
+        const eventsGrid = document.getElementById('eventsGrid');
+        const bookingsBody = document.getElementById('bookingsBody');
+        const emptyBookings = document.getElementById('emptyBookings');
+        const bookingModalOverlay = document.getElementById('bookingModalOverlay');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const bookingForm = document.getElementById('bookingForm');
+        const modalEventTitle = document.getElementById('modalEventTitle');
+        const modalEventId = document.getElementById('modalEventId');
+        const customerNameInput = document.getElementById('customerName');
+        const ticketQtyInput = document.getElementById('ticketQty');
+        const modalTotalPrice = document.getElementById('modalTotalPrice');
+        const decQty = document.getElementById('decQty');
+        const incQty = document.getElementById('incQty');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        const toastIcon = document.getElementById('toastIcon');
+
+        // Cargar datos al iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            loadEvents();
+            loadBookings();
+            
+            // Eventos de botones
+            closeModalBtn.addEventListener('click', closeModal);
+            bookingModalOverlay.addEventListener('click', (e) => {
+                if (e.target === bookingModalOverlay) closeModal();
+            });
+
+            decQty.addEventListener('click', () => adjustQty(-1));
+            incQty.addEventListener('click', () => adjustQty(1));
+
+            bookingForm.addEventListener('submit', handleBookingSubmit);
+        });
+
+        // Mostrar Toast
+        function showToast(message, type = 'success') {
+            toastMessage.textContent = message;
+            toast.className = `toast active ${type}`;
+            
+            // Icono del Toast
+            if (type === 'success') {
+                toastIcon.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>`;
+            } else {
+                toastIcon.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>`;
+            }
+
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 4000);
+        }
+
+        // Obtener y listar Espectáculos
+        async function loadEvents() {
+            try {
+                const response = await fetch(API_URLS.events);
+                if (!response.ok) throw new Error('Error al conectar con event-service');
+                const events = await response.json();
+                
+                eventsGrid.innerHTML = '';
+                events.forEach(event => {
+                    const card = createEventCard(event);
+                    eventsGrid.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error al cargar espectáculos:', error);
+                eventsGrid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; color: var(--error); padding: 2rem; background: rgba(239, 68, 68, 0.1); border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.2)">
+                        <h3>Error de Conexión</h3>
+                        <p style="font-size:0.95rem; margin-top: 0.5rem;">Asegúrate de que los microservicios 'gateway-service' y 'event-service' estén corriendo y registrados en Eureka.</p>
+                    </div>`;
+            }
+        }
+
+        // Crear Tarjeta de Espectáculo
+        function createEventCard(event) {
+            const card = document.createElement('article');
+            card.className = 'event-card';
+            
+            // Determinar categoría del badge
+            let category = 'ESPECTÁCULO';
+            if (event.title.toLowerCase().includes('concierto')) category = 'MÚSICA';
+            if (event.title.toLowerCase().includes('teatro') || event.title.toLowerCase().includes('hamlet')) category = 'TEATRO';
+            if (event.title.toLowerCase().includes('comedy') || event.title.toLowerCase().includes('risas')) category = 'COMEDIA';
+            if (event.title.toLowerCase().includes('ópera')) category = 'ÓPERA';
+
+            const percentage = (event.availableTickets / 150) * 100; // basado en el stock máx aprox del inicializador
+            let progressClass = '';
+            if (event.availableTickets <= 15) progressClass = 'critical';
+            else if (event.availableTickets <= 40) progressClass = 'low';
+
+            card.innerHTML = `
+                <div>
+                    <div class="event-badge">${category}</div>
+                    <h3 class="event-title">${event.title}</h3>
+                    <p class="event-description">${event.description}</p>
+                </div>
+                
+                <div>
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            <span>${event.date}</span>
+                        </div>
+                        <div class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            <span>${event.location}</span>
+                        </div>
+                        <div class="stock-indicator">
+                            <span>Disponibles: <strong>${event.availableTickets}</strong></span>
+                        </div>
+                        <div class="stock-bar">
+                            <div class="stock-progress ${progressClass}" style="width: ${Math.min(percentage, 100)}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="event-footer">
+                        <div class="event-price">
+                            <span class="price-label">Precio</span>
+                            <span class="price-value">$${event.price.toFixed(2)}</span>
+                        </div>
+                        <button class="buy-btn" ${event.availableTickets === 0 ? 'disabled' : ''}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="9" cy="21" r="1"/>
+                                <circle cx="20" cy="21" r="1"/>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                            </svg>
+                            ${event.availableTickets === 0 ? 'Agotado' : 'Comprar'}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Agregar evento al botón
+            const btn = card.querySelector('.buy-btn');
+            if (btn && event.availableTickets > 0) {
+                btn.addEventListener('click', () => openBookingModal(event));
+            }
+
+            return card;
+        }
+
+        // Obtener y listar Historial de Compras
+        async function loadBookings() {
+            try {
+                const response = await fetch(API_URLS.bookings);
+                if (!response.ok) throw new Error('Error al conectar con booking-service');
+                const bookings = await response.json();
+
+                if (bookings.length === 0) {
+                    emptyBookings.style.display = 'flex';
+                    bookingsBody.innerHTML = '';
+                    return;
+                }
+
+                emptyBookings.style.display = 'none';
+                bookingsBody.innerHTML = '';
+                
+                // Ordenar por ID descendente para ver las últimas primero
+                bookings.sort((a, b) => b.id - a.id);
+
+                bookings.forEach(booking => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><span class="booking-id">#B-${booking.id}</span></td>
+                        <td><span class="booking-client">${escapeHtml(booking.customerName)}</span></td>
+                        <td><span class="booking-event">${escapeHtml(booking.eventTitle)}</span></td>
+                        <td style="text-align: center;"><span class="booking-qty">${booking.quantity}</span></td>
+                        <td><span class="booking-amount">$${booking.totalAmount.toFixed(2)}</span></td>
+                        <td><span class="booking-date">${booking.bookingDate}</span></td>
+                    `;
+                    bookingsBody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error al cargar compras:', error);
+                emptyBookings.innerHTML = `
+                    <p style="color: var(--error);">Error de comunicación con 'booking-service'.</p>
+                `;
+            }
+        }
+
+        // Modal: Abrir
+        function openBookingModal(event) {
+            selectedEvent = event;
+            modalEventTitle.textContent = `Boletos para: ${event.title}`;
+            modalEventId.value = event.id;
+            customerNameInput.value = '';
+            ticketQtyInput.value = 1;
+            updateModalPrice();
+            
+            bookingModalOverlay.classList.add('active');
+            customerNameInput.focus();
+        }
+
+        // Modal: Cerrar
+        function closeModal() {
+            bookingModalOverlay.classList.remove('active');
+            selectedEvent = null;
+        }
+
+        // Modal: Ajustar Cantidad
+        function adjustQty(amount) {
+            if (!selectedEvent) return;
+            let current = parseInt(ticketQtyInput.value);
+            let next = current + amount;
+
+            if (next >= 1 && next <= selectedEvent.availableTickets) {
+                ticketQtyInput.value = next;
+                updateModalPrice();
+            } else if (next > selectedEvent.availableTickets) {
+                showToast(`Lo sentimos, solo quedan ${selectedEvent.availableTickets} boletos disponibles.`, 'error');
+            }
+        }
+
+        // Modal: Actualizar Precio Total
+        function updateModalPrice() {
+            if (!selectedEvent) return;
+            const qty = parseInt(ticketQtyInput.value);
+            const total = selectedEvent.price * qty;
+            modalTotalPrice.textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Modal: Enviar Formulario de Compra
+        async function handleBookingSubmit(e) {
+            e.preventDefault();
+            
+            const eventId = parseInt(modalEventId.value);
+            const customerName = customerNameInput.value.trim();
+            const quantity = parseInt(ticketQtyInput.value);
+
+            if (!customerName) {
+                showToast('Por favor introduce tu nombre', 'error');
+                return;
+            }
+
+            const payload = { eventId, customerName, quantity };
+
+            try {
+                const response = await fetch(API_URLS.bookings, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errText = await response.text();
+                    let errMsg = 'No se pudo procesar la compra.';
+                    try {
+                        const errJson = JSON.parse(errText);
+                        errMsg = errJson.message || errMsg;
+                    } catch(e) {}
+                    throw new Error(errMsg);
+                }
+
+                const result = await response.json();
+                showToast(`¡Compra #${result.id} realizada con éxito!`, 'success');
+                
+                closeModal();
+                
+                // Recargar interfaz
+                await loadEvents();
+                await loadBookings();
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        // Helper para prevenir XSS en strings ingresadas por el usuario
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    </script>
+</body>
+</html>
