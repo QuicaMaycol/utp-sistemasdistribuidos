@@ -8,7 +8,7 @@ spring:
 supabase:
   url: https://mqsupabase.dashbportal.com
   anon-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzcyODM4MjkwLCJleHAiOjIwODgxOTgyOTB9.NdfHsNVkPwxgCu4K73CxkRZe2mbizFiasQQE9FElBNY
-  schema: sistemabd
+  schema: public
 
 eureka:
   client:
