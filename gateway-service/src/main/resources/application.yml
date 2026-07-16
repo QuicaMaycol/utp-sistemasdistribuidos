@@ -6,18 +6,6 @@ spring:
     name: gateway-service
   cloud:
     gateway:
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins: "*"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - PATCH
-              - DELETE
-              - OPTIONS
-            allowedHeaders: "*"
       routes:
         - id: auth-route
           uri: ${AUTH_SERVICE_URL:lb://auth-service}
