@@ -307,7 +307,7 @@
             // CONFIGURACIÓN DE URL DEL API GATEWAY
             // Deja vacío '' si el frontend se aloja en el propio Gateway.
             // Pon 'https://tu-gateway.onrender.com' si subes este index.html a tu hosting independiente.
-            const API_BASE_URL = '';
+            const API_BASE_URL = 'https://utp-gateway-service.onrender.com';
 
             const loginSection = document.getElementById('login-section');
             const dashboardSection = document.getElementById('dashboard-section');
@@ -472,7 +472,13 @@
                         body: JSON.stringify({ username, password })
                     });
 
-                    const data = await response.json();
+                    const text = await response.text();
+                    let data = {};
+                    try {
+                        data = JSON.parse(text);
+                    } catch (err) {
+                        throw new Error(`Respuesta inválida (Código ${response.status}). El servidor podría estar iniciando.`);
+                    }
 
                     if (response.ok) {
                         if (data.mfaRequired) {
@@ -502,7 +508,7 @@
                     }
                 } catch (error) {
                     console.error("Login credentials request failed:", error);
-                    loginErrorText.textContent = "Error de comunicación con el servidor.";
+                    loginErrorText.textContent = "Error de conexión: " + error.message;
                     loginError.classList.remove('hidden');
                 }
             });
@@ -522,8 +528,15 @@
                         body: JSON.stringify({ username, code })
                     });
 
+                    const text = await response.text();
+                    let data = {};
+                    try {
+                        data = JSON.parse(text);
+                    } catch (err) {
+                        throw new Error(`Respuesta inválida (Código ${response.status}). El servidor podría estar iniciando.`);
+                    }
+
                     if (response.ok) {
-                        const data = await response.json();
                         sessionStorage.setItem('username', data.username);
                         sessionStorage.setItem('mfa_enabled', 'true');
                         sessionStorage.setItem('jwt_token', data.token);
@@ -536,12 +549,12 @@
 
                         checkSession();
                     } else {
-                        loginErrorText.textContent = "Código incorrecto. Vuelve a intentarlo.";
+                        loginErrorText.textContent = data.mensaje || "Código incorrecto. Vuelve a intentarlo.";
                         loginError.classList.remove('hidden');
                     }
                 } catch (error) {
                     console.error("MFA code validation failed:", error);
-                    loginErrorText.textContent = "Error al verificar código.";
+                    loginErrorText.textContent = "Error de conexión: " + error.message;
                     loginError.classList.remove('hidden');
                 }
             });
