@@ -41,13 +41,20 @@ public class SupabaseUsuarioAdapter implements UsuarioRepositoryPort {
     @SuppressWarnings("rawtypes")
     @Override
     public Optional<Usuario> findByUsername(String username) {
+        System.out.println("[SUPABASE DEBUG] Buscando usuario en Supabase: " + username);
         String url = supabaseUrl + "/rest/v1/usuarios?username=eq." + username;
         HttpEntity<?> entity = new HttpEntity<>(getHeaders(false));
         try {
             ResponseEntity<Map[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map[].class);
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null && response.getBody().length > 0) {
-                Map<String, Object> map = response.getBody()[0];
-                return Optional.of(mapToDomain(map));
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                System.out.println("[SUPABASE DEBUG] Respuesta de Supabase recibida. Cantidad de registros: " + response.getBody().length);
+                if (response.getBody().length > 0) {
+                    Map<String, Object> map = response.getBody()[0];
+                    System.out.println("[SUPABASE DEBUG] Usuario encontrado en DB: " + map.get("username") + " | ROL: " + map.get("rol"));
+                    return Optional.of(mapToDomain(map));
+                } else {
+                    System.out.println("[SUPABASE DEBUG] Usuario '" + username + "' no existe en la base de datos.");
+                }
             }
         } catch (Exception e) {
             System.err.println("[SUPABASE ERROR] Fallo al buscar usuario: " + e.getMessage());
